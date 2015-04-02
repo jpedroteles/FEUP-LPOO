@@ -18,6 +18,37 @@ public class Maze {
 		this.maze = maze;
 	}
 	
+	
+	public int getWidth() {
+		return width;
+	}
+
+
+	public void setWidth(int width) {
+		this.width = width;
+	}
+
+
+	public int getHeight() {
+		return height;
+	}
+
+
+	public void setHeight(int height) {
+		this.height = height;
+	}
+
+
+	public Symbols[][] getMaze() {
+		return maze;
+	}
+
+
+	public void setMaze(Symbols[][] maze) {
+		this.maze = maze;
+	}
+
+
 	public char getSymbolChar(Symbols symbol) {
 		char res = '.';
 
@@ -79,17 +110,6 @@ public class Maze {
 		}
 	
 	/*
-	public static void moveHeroDrake() {
-		char move = ' ';
-		System.out.print("Introduza a direcao a tomar: ");
-		Scanner reader = new Scanner(System.in);
-		move = reader.next().charAt(0);
-		Hero.moveHero(move);
-		if(move!= ' '){
-			Dragon.moveDragon();
-		}		
-	}
-	
 	static void finalMessage(Hero player1, Dragon dragon1) {
 		if(Hero.getMeta()){
 				System.out.print("Parabéns ganhou o jogo");

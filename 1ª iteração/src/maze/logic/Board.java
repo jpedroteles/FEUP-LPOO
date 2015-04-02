@@ -2,11 +2,18 @@ package maze.logic;
 import java.util.Scanner;
 import java.util.Arrays;
 
+import maze.logic.Maze.Symbols;
+
 
 public class Board {
 	private char [][] board;
 	private int dimension;
 	private Position exit;
+	private Symbols[][] maze;
+	
+	public enum Symbols {
+		PATH, WALL, EXIT
+	}
 	
 	public Board(int dimension){
 		if(dimension ==0){
@@ -31,7 +38,7 @@ public class Board {
 	public void setSymbol(Position p,char c){
 		board[p.getX()][p.getY()]=c;
 	}
-	public int getDimensio(){
+	public int getDimension(){
 		return dimension;
 	}	
 	public Position getExit(){
