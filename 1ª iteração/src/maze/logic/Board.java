@@ -12,7 +12,7 @@ public class Board {
 	private Symbols[][] maze;
 	
 	public enum Symbols {
-		PATH, WALL, EXIT
+		PATH, WALL, EXIT,VISITED,
 	}
 	
 	public Board(int dimension){

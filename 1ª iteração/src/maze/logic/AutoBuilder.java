@@ -7,14 +7,15 @@ import java.util.Stack;
 import maze.logic.Maze.Symbols;
 
 public class AutoBuilder implements MazeBuilder {
-
+	
 	private final Random rand;
 	/**
 	 * Maze Builder Parameters
 	 */
 	private Symbols[][] maze_matrix;
 	private int maze_size;
-
+	private int width=Maze.getWidth();
+	private int height=Maze.getHeight();
 	/**
 	 * Random Maze Generation
 	 */
@@ -22,7 +23,7 @@ public class AutoBuilder implements MazeBuilder {
 	private Position m_exit;
 	private Stack<Position> maze_stack;
 
-	private char[][] visitedCells;
+	private Symbols[][] visitedCells;
 	private int visitedCellsDimension;
 
 	public Maze buildEmpty() {
@@ -41,7 +42,7 @@ public class AutoBuilder implements MazeBuilder {
 	}
 
 	public boolean exteriorWall(int i, int j) {
-		return (j == 0 || j == Maze.getWidth() - 1||i == 0|| i == Maze.getHeight() - 1);
+		return (j == 0 || j ==width- 1||i == 0|| i == height - 1);
 
 	}
 
