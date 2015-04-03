@@ -1,72 +1,147 @@
 package maze.logic;
 
+import java.util.ArrayList;
+import java.util.Random;
 import java.util.Scanner;
 import java.util.Arrays;
 
 public class Maze {
-	
+
 	private int width, height;
-	private Symbols[][] maze;
-	
-	public enum Symbols {
-		PATH, WALL, EXIT
-	}
-	
-	public Maze(int width, int height, Symbols[][] maze) {
-		this.width = width;
-		this.height = height;
-		this.maze = maze;
-	}
-	
-	
-	public int getWidth() {
-		return width;
-	}
+	private Board board;
+	private Hero hero;
+	private Sword sword;
+	private boolean end;
+	private ArrayList<Dragon> dragons;
 
+	public Maze(int boardDimension, int dragonsCount) {
 
-	public void setWidth(int width) {
-		this.width = width;
-	}
+		this.board = new Board(boardDimension);
+		this.hero = new Hero(new Position(1, 1));
+		this.sword = new Sword(new Position(8, 1));
+		this.dragons = new ArrayList<Dragon>();
 
+		this.end = false;
 
-	public int getHeight() {
-		return height;
-	}
+		Scanner reader = new Scanner(System.in);
+		char input;
 
-
-	public void setHeight(int height) {
-		this.height = height;
-	}
-
-
-	public Symbols[][] getMaze() {
-		return maze;
-	}
-
-
-	public void setMaze(Symbols[][] maze) {
-		this.maze = maze;
-	}
-
-
-	public char getSymbolChar(Symbols symbol) {
-		char res = '.';
-
-		switch (symbol) {
-		case PATH:
-			res = ' ';
-			break;
-		case WALL:
-			res = 'X';
-			break;
-		case EXIT:
-			res = 'S';
-			break;
+		// Add dragons
+		for (int i = 0; i < dragonsCount; i++) {
+			this.newDragon();
 		}
 
-		return res;
+		this.drawPieces();
+		this.board.printsMaze();
+
+		do {
+
+			System.out.print("\n> ");
+			input = reader.next(".").charAt(0);			
+
+			if (!moveHero(input,hero)) {
+				board.printsMaze();
+				continue;
+			}
+
+			this.updatePieces();
+			this.drawPieces();
+			board.printsMaze();
+
+		} while (!end && !this.hero.isDead());
+
+		if (end) {
+			System.out.println("\nYOU WON!");
+		} else {
+			System.out.println("\nGAME OVER! ");
+		}
+
+		reader.close();
+
 	}
 
+	private void drawPieces() {
+		// Draw Dragons
+		for (int i = 0; i < this.dragons.size(); i++) {
+			if (this.board.getSymbol(this.dragons.get(i).getPosition()) == 'E') {
+				this.board.setSymbol(this.dragons.get(i).getPosition(), 'F');
+			} else {
+				this.board.setSymbol(this.dragons.get(i).getPosition(),
+						this.dragons.get(i).getSymbol());
+			}
+		}
+
+		// Draw Hero
+		board.setSymbol(this.hero.getPosition(), this.hero.getSymbol());
+		board.setSymbol(this.sword.getPosition(), this.sword.getSymbol());
+
+	}
+
+	private void updatePieces() {
+
+		Random random = new Random();
+
+		// Hero
+		if (this.hero.getPosition().isEqual(this.board.getExit())) {
+			this.end = true;
+			return;
+		}
+
+		// Dragons
+		for (int i = 0; i < this.dragons.size(); i++) {
+
+			this.dragons.get(i).setSleeping(random.nextBoolean());
+			if (!this.dragons.get(i).isSleepling()) {
+				//moveDragon(this.dragons.get(i));
+			}
+
+			if (this.dragons.get(i).getPosition()
+					.isAdjacent(this.hero.getPosition())) {
+
+				if (this.hero.isArmed()) {
+					this.board
+							.setSymbol(this.dragons.get(i).getPosition(), ' ');
+					this.dragons.remove(i--);
+				} else {
+					this.hero.setDead();
+				}
+
+			}
+
+		}
+		if (this.sword.getPosition().isEqual(this.hero.getPosition())) {
+
+			this.hero.setArmed();
+
+		}
+
+	}
+
+	private void newDragon() {
+		Position dragonPosition;
+		do {
+			dragonPosition = this.randomPlace();
+		} while (dragonPosition.isAdjacent(this.hero.getPosition()));
+
+		this.dragons.add(new Dragon(dragonPosition));
+
+	}
+
+	// Dragons spawn
+	private Position randomPlace() {
+
+		Position p = new Position(0, 0);
+		Random random = new Random();
+		int max = board.getDimension() - 1;
+
+		do {
+			p.setX(random.nextInt(max));
+			p.setY(random.nextInt(max));
+		} while (!board.isPath(p));
+
+		return p;
+
+	}
 
 	public boolean heroCanWalk(char dir, Hero hero) {
 		int x = hero.getPosition().getX();
@@ -75,47 +150,42 @@ public class Maze {
 		switch (dir) {
 		// scanning cell to the right
 		case 'd':
-			if (maze[y][x + 1] != Symbols.EXIT)
-				return maze[y][x + 1] != Symbols.WALL;
+			if (board.isExit(new Position(y, x + 1)))
+				return board.isWall(new Position(y, x + 1));
 			break;
 		// scanning cell to the south
 		case 's':
-			if (maze[y + 1][x] != Symbols.EXIT)
-				return maze[y + 1][x] != Symbols.WALL;
-			break;
-		// scanning cell to the left
+			if (board.isExit(new Position(y + 1, x)))
+				return board.isWall(new Position(y + 1, x));
+			break; // scanning cell to the left
 		case 'a':
-			if (maze[y][x - 1] != Symbols.EXIT)
-				return maze[y][x - 1] != Symbols.WALL;
-			break;
-		// scanning cell to the north
+			if (board.isExit(new Position(y, x - 1)))
+				return board.isWall(new Position(y, x - 1));
+			break; // scanning cell to the north
 		case 'w':
-			if (maze[y - 1][x] != Symbols.EXIT)
-				return maze[y - 1][x] != Symbols.WALL;
+			if (board.isExit(new Position(y - 1, x)))
+				return board.isWall(new Position(y - 1, x));
 			break;
 		default:
 			break;
 		}
-
 		// if hero is trying to walk to maze exit
-		
-		if (hero.KilledDragon())
+		if (hero.isArmed())
 			return true;
 		else
 			return false;
 	}
 
+	private boolean moveHero(char dir, Hero hero) {
+		if (heroCanWalk(dir, hero)) {			
+			hero.move(this,dir);			
+			return true;
+		} else 
+			return false;
+	}
+
 	public boolean dragonCanWalkTo(int x, int y) {
-			return maze[y][x] == Symbols.PATH;
-		}
-	
-	/*
-	static void finalMessage(Hero player1, Dragon dragon1) {
-		if(Hero.getMeta()){
-				System.out.print("Parabéns ganhou o jogo");
-				}
-		else if(Dragon.getMata()){
-			System.out.print("Game Over");
-		}
-	}*/
+		return board.isPath(new Position(y, x));
+	}
+
 }

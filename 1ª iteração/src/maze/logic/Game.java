@@ -3,17 +3,20 @@ package maze.logic;
 import java.util.ArrayList;
 import java.util.Random;
 
-import maze.logic.Maze.Symbols;
 
 public class Game {
 	Random random = new Random();
-
 	private Maze maze;
-	private Symbols[][] maz;
 	private Position p;
 	private Hero hero;
 	private Sword sword;	
 	private static ArrayList<Dragon> dragons;
+	
+	public static enum TipoJogo {
+		Parado, Mover, Mover_Dormir
+	}
+	
+	private TipoJogo tipoJogo = TipoJogo.Parado;
 
 	private boolean GameState;
 	private boolean exitOpen;
@@ -21,21 +24,13 @@ public class Game {
 	//Constructor for manualbuilder
 	public Game() {
 		
-		p= new Position(0,0);
-		
-		maze = new Maze(10, 10, maz);
+		Position pHero = new Position(1,1);
+		Position pSword = new Position(8,1);
+		Position pDragon = new Position(1,3);
+		maze = new Maze(10, 1);
 		hero = new Hero(p);
 		sword = new Sword(p);		
-
-		GameState = false;
-
-		exitOpen = false;
-
-		/*
-		dragons = new ArrayList<Dragon>();
-		dragons.add(new Dragon(0, 0));
-		dragons.add(new Dragon(0, 0));
-		dragons.add(new Dragon(0, 0));*/
+		//maze = new (height, width);
 	}
 	
 	//Constructor for autobuilder
@@ -50,21 +45,9 @@ public class Game {
 
 		exitOpen = false;		
 
-		/*dragons = new ArrayList<Dragon>();
-
-		for (int i = 0; i < number_dragons; i++) {
-			dragons.add(new Dragon(p, true));
-		}*/
-
-	}
 	
-	public boolean getGameState() {
-		return GameState;
+
 	}
 
-	public Hero getHero() {
-		return hero;
-	}
-	
 
 }

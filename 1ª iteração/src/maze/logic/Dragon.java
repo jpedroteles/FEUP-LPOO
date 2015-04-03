@@ -4,34 +4,52 @@ import java.util.Random;
 
 public class Dragon extends Piece {
 
-	// Posiçao inicial do hero
-	// Position p= new Position(1,3);
 	private boolean dead = false;
 	private boolean sleep;
+	private int sleepingTime=0;
 	DragonBehavior behavior = DragonBehavior.MOVING;
 
 	public enum DragonBehavior {
 		NOTMOVING, MOVING, MOVINGANDSLEEPING
 	}
 
-	public Dragon(Position p, DragonBehavior behavior) {
+	public Dragon(Position p) {
 		super(p, 'D');
 		boolean dead = false;
-		this.behavior = behavior;
+		Random random = new Random();
+		this.setSleeping( random.nextBoolean() );
 	}
+	
+
+	public int getSleepingTime() {
+		return sleepingTime;
+	}
+
+
+	public void setSleepingTime(int sleepingTime) {
+		this.sleepingTime = sleepingTime;
+	}
+
 
 	public boolean isDead() {
 		return dead;
 	}
+	
+	public void setDead() {
+		dead=true;
+	}
+
 
 	public boolean isSleepling() {
 		return sleep;
 	}
 
-	private void setSleeping() {
-		if (sleep == false) {
+	public void setSleeping(boolean sleeping) {
+		this.sleep = sleeping;
+		if ( sleeping ) {
 			this.setSymbol('d');
-			this.sleep = true;
+		} else {
+			this.setSymbol('D');
 		}
 	}
 
@@ -42,27 +60,30 @@ public class Dragon extends Piece {
 		}
 	}
 
-	public void move(Maze maze, char direction) {
-
+	public void move(Maze maze) {
+		Random rand = new Random();
+		int direction = rand.nextInt(5);
 		if (behavior != DragonBehavior.NOTMOVING && !sleep) {
 			// moving dragon randomly
 			switch (direction) {
-			case 'w':
+			case 0:
+				break;
+			case 1:
 				if (maze.dragonCanWalkTo(getPosition().getX(), getPosition()
 						.getY() - 1))
 					getPosition().setY(getPosition().getY() - 1);
 				break;
-			case 'd':
+			case 2:
 				if (maze.dragonCanWalkTo(getPosition().getX() + 1,
 						getPosition().getY()))
 					getPosition().setX(getPosition().getX() + 1);
 				break;
-			case 's':
+			case 3:
 				if (maze.dragonCanWalkTo(getPosition().getX(), getPosition()
 						.getY() + 1))
 					getPosition().setY(getPosition().getY() + 1);
 				break;
-			case 'a':
+			case 4:
 				if (maze.dragonCanWalkTo(getPosition().getX() - 1,
 						getPosition().getY()))
 					getPosition().setX(getPosition().getX() - 1);
@@ -71,15 +92,23 @@ public class Dragon extends Piece {
 		}
 
 		if (behavior == DragonBehavior.MOVINGANDSLEEPING) {
-			Random r = new Random();
-
-			// making dragon sleep sometimes
-			int sleep = r.nextInt(2);
-
-			if (sleep == 1)
-				setSleeping();
-			else
-				wake();
+			sleepDragon(this);
 		}
+			else
+			wake();
+		}
+	
+	
+	public boolean sleepDragon(Dragon dragon) {
+		if (dragon.getSleepingTime() == 0) {
+			Random rand = new Random();
+			if (rand.nextInt(5) == 0) {
+				dragon.setSleepingTime(3 + rand.nextInt(4));
+				return true;
+			}
+		} else {
+			dragon.setSleepingTime(dragon.getSleepingTime() - 1);
+		}
+		return (dragon.getSleepingTime() > 0);
 	}
 }

@@ -41,23 +41,5 @@ public class Position {
 	public boolean isAdjacent(Position p){
 		return Math.abs(this.x-p.getX())+Math.abs(this.y-p.getY())<=1; 
 	}
-	
-	public Position next(int direction){
-		Position p= new Position(this);
-		switch(direction){
-		case UP:
-			p.setY(this.y-1);
-			break;
-		case DOWN:
-			p.setY(this.y+1);
-			break;	
-		case LEFT:
-			p.setX(this.x-1);
-			break;
-		case RIGHT:
-			p.setX(this.x+1);
-			break;
-	}
-	return p;
-	}
+
 }
