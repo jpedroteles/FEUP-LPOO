@@ -30,9 +30,9 @@ public class Maze {
 		for (int i = 0; i < dragonsCount; i++) {
 			this.newDragon();
 		}
-
-		this.drawPieces();
+		
 		this.board.printsMaze();
+		this.drawPieces();
 
 		do {
 
